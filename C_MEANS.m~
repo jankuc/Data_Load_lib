@@ -1,0 +1,134 @@
+function [W] = LLOYD(X,m,e)
+%X....matice radkovych vektoru (vstup site)
+%a,b..rozmery neuronove site a x b.
+%T....pocet iteraci
+%h....neighborhood function zavisla na t
+%n....je dimenze problemu
+%r....je pocet vstupnich vektoru x (tedy vstupů)
+[r, n] = size(X);
+if 0
+    tmp = median(X);
+    TMP = zeros(m,n);
+    for k = 1:m
+        TMP(k,:) = tmp;
+    end
+    W = TMP - 0.05*ones(m,n) + 0.1*rand(m,n);
+    clear tmp TMP
+end
+W = rand(m,n);
+W = [W zeros(m,2)];
+plot (W')
+
+
+%% Algoritmus
+E = inf;
+while E < e
+    W_new = zeros(size(W));
+    for k=1:r
+        x = X(k,:);
+        %% s = VITEZ(x,W,zeros(m,1))
+        d = zeros(1,m);
+        for l=1:m
+            d(l) = (x-W(l,1:n))^2;
+        end
+        [~, s] = min(d);
+        W_new(s,n+2) = W_new(s,n+2) + (d(s))^2;
+        
+        
+        W_new(s,1:n) = W_new(s,1:n) + x;
+        W_new(s,n+1) = W_new(s,n+1) + 1;
+    end
+    E = sum(W_new(:,n+2))/r;
+    
+    
+    for k = 1:m
+        W_new(k,1:n) = W_new(k,1:n) / W_new(k,n+1);
+        W_new(k,n+1) = 1;
+    end
+
+    
+    
+    
+    %% testovani zmeny matice W (po sloupcich)
+    tp = W(:,1:n);
+    if 1
+        for l = 1:n
+            if sum(~isnan(W_new(:,l))) && sum(~isnan(tp(:,l)))
+                if W_new(:,l) == tp(:,l)
+                    zmena = 0;
+                end
+            end
+        end
+    end
+    %% testovani, doby behu algoritmu
+    if t == T
+        disp(['t > T = ' num2str(T)])
+        return
+    end
+    %% AKTUALIZACE VAH
+    W = W_new;
+    plot((W(:,1:n))')
+    title (['t = ' num2str(t)])
+    drawnow
+    t= t+1;
+    
+end
+t
+        
+%         
+%         
+%         %% Conscience
+%         for asdf=1
+%             % pokud se povoli Conscience tak se musi odkomentovat radek za
+%             % zmenou vah pro pridani p_old do W
+%             if 1
+%                 y = zeros(m,1);
+%                 y(s) = 1;
+%                 p_old = W(:,n+1);
+%                 p_new =  p_old+B*(y-p_old);
+%                 b = C*(1/m - p_new);
+%                 %% s = VITEZ(x,W,b);
+%                 d = zeros(1,m);
+%                 for l=1:m
+%                     d(l) = sum((x-W(l,1:length(x)).^2) - b(l));
+%                 end
+%                 [~, s] = min(d);
+%             end
+%         end
+%         
+%         %% WEIGHTS
+%         tmp = H{s}(:); % tmp je ted vektor vzdaenosti od viteze
+%         for q = 1:m
+%             if tmp(q)<=sigma(t) % weights change only if the neuron is in the neighbourhood. ta podminka by tam nemusela byt, ale je to tak rychlesji
+%                 W_new(q,:) = W_new(q,:) + h_mat(tmp(q)+1,t)*(x - W_new(q,:));
+%             end
+%         end       
+%         W(:,n+1) = p_new;
+%         
+%     end
+%     %% testovani zmeny matice W (po sloupcich)
+%     
+%     tp = W(:,1:n);
+%     if 1
+%         for l = 1:n
+%             if sum(~isnan(W_new(:,l))) && sum(~isnan(tp(:,l)))
+%                 if W_new(:,l) == tp(:,l)
+%                     zmena = 0;
+%                 end
+%             end
+%         end
+%     end
+%     %% testovani, doby behu algoritmu
+%     if t == T
+%         disp(['t > T = ' num2str(T)])
+%         return
+%     end
+%     W(:,1:n) = W_new;
+%     
+%     plot((W(:,1:n))')
+%     title (['t = ' num2str(t)])
+%     drawnow
+%     t= t+1;
+%     
+% end
+% t

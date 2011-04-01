@@ -1,0 +1,52 @@
+zac = 1;
+cele = [100:107,109];
+for k = cele
+    num = num2str(k);
+    Y = OPEN_CUT_DATA(['cutData/' num '_00:30:00']);
+    new_sample_freq = 100;
+    Y = INTERP(Y,new_sample_freq);
+    %% cely soubor rozdelim na 'deleni' casti a vemu v potaz jen 'l'ou cast
+    l = 3;
+    deleni = 7;
+    Y = Y(floor((l-1)*size(Y,1)/deleni+1):floor((l)*size(Y,1)/deleni),:);
+    %% tvorba vektoru z R2
+    %     for kx = 1:size(Y,2)
+    %         for ky = 1:size(Y,1)
+    %             Ynew((ky-1)*size(Y,1) + kx,1) = Y(ky,kx);
+    %             Ynew((ky-1)*size(Y,1) + kx,2) = kx;
+    %         end
+    %     end
+    %     Y = Ynew;
+    
+    if zac == 1
+        Z = NORM(Y);
+    else
+        if size(Y,2)>=size(Z,2)
+            Z = [Z;NORM(Y(:,1:size(Z,2)))];
+        else
+            Y = [NORM(Y), NaN(size(Y,1),size(Z,2)-size(Y,2))];
+            Z = [Z;Y];
+        end
+    end
+    figure(k-99)
+    plot((Y)')
+    title(['MIT-' num2str(k) 'sampled to '])
+    zac = 2;
+    continue
+    % figure(1)
+    % plot((1:size(Z,2))/360,Z(1:size(Z,1),:));
+    a = 1;
+    b = 1;
+    T = 150;
+    [W H] = SOM(Z,a,b,T);
+    figure(k-99)
+    plot((1:size(W,2))/360,W(1:size(W,1),:));
+    title(['MIT-' num2str(k) ' downsampled to ' num2str(new_sample_freq) ' with T=' num2str(T) ]);
+    disp (['MIT-' num2str(k) ' done.'])
+end
+%X....matice radkovych vektoru (vstup site)
+%a,b..rozmery neuronove site a x b.
+%T....pocet iteraci
+%h....neighborhood function zavisla na t
+%n....je dimenze problemu
+%r....je pocet vstupnich vektoru x (tedy vstupů)

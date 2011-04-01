@@ -1,0 +1,46 @@
+% ro = 0:0.1:10;
+% h =  exp(-ro.^2 ./2.*0.95.^2);
+% subplot(131);
+% plot (ro,h);
+% h=exp((ro.^2)./-0.95^2).*(1-(2./0.95.^2).*ro.^2);
+% 
+% subplot(132);
+% plot (ro,h);
+% 
+% a = 9;
+% for ro = 1:100
+%     if ro <= a
+%         h(ro) = 1;
+%     elseif ro > 3*a
+%         h(ro) = 0;
+%     else
+%         h(ro) = -1/3;
+%     end
+% end
+% 
+% subplot(133);
+% plot (0:100,h);
+
+%% Inicializace matice funkce h
+T = 600;
+
+alpha0 = 0.95;
+alpha = alpha0 * exp(-(1:T)/15);
+net_size = max(max(H{1}));
+sigma = net_size * exp(-(1:T)/15);
+h = inline('alpha*exp(-k^2/(2*sigma))','k','alpha','sigma');
+h_mat = zeros(net_size+1,T);
+for k = 1:net_size+1
+    for l = 1:T
+        if k-1 == 0
+            h_mat(k,l) = alpha(l);
+        elseif k-1 <= sigma(l)
+            h_mat(k,l) = h(k-1,alpha(l),sigma(l));
+        else
+            h_mat(k,l) = 0;
+        end
+    end
+end
+
+disp('asdf')
+
