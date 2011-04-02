@@ -123,3 +123,5 @@ while zmena > 0
     
 end
 t
+% a ted uplne jiny pokus
+
